@@ -1,9 +1,8 @@
-"""src: A Flower / PyTorch app."""
-
 from flwr.common import Context, ndarrays_to_parameters
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.server.strategy import FedAvg
-from src.task import Net, get_weights
+from src.utils import get_weights
+from models.lstm import LSTM
 
 
 def server_fn(context: Context):
@@ -12,7 +11,7 @@ def server_fn(context: Context):
     fraction_fit = context.run_config["fraction-fit"]
 
     # Initialize model parameters
-    ndarrays = get_weights(Net())
+    ndarrays = get_weights(LSTM())
     parameters = ndarrays_to_parameters(ndarrays)
 
     # Define strategy

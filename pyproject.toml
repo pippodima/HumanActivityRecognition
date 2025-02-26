@@ -21,16 +21,16 @@ packages = ["."]
 publisher = "pippodima"
 
 [tool.flwr.app.components]
-serverapp = "src.server_app:app"
-clientapp = "src.client_app:app"
+serverapp = "src.server:app"
+clientapp = "src.client:app"
 
 [tool.flwr.app.config]
 num-server-rounds = 3
-fraction-fit = 0.5
+fraction-fit = 1
 local-epochs = 1
 
 [tool.flwr.federations]
 default = "local-simulation"
 
 [tool.flwr.federations.local-simulation]
-options.num-supernodes = 10
+options.num-supernodes = 2
