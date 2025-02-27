@@ -29,26 +29,10 @@ class FlowerClient(NumPyClient):
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
 
 
-client_counter = 0
-client_id_map = {}
-counter_lock = threading.Lock()
 
 
 def client_fn(context: Context):
-    global client_counter
-    node_id = context.node_id
-
-    # Check if node_id already exists in the mapping
-    with counter_lock:
-        if node_id in client_id_map:
-            client_id = client_id_map[node_id]
-            script_logger.info(f"Reconnecting client: {node_id}, assigned id: {client_id}")
-        else:
-            client_counter += 1
-            client_id = client_counter
-            client_id_map[node_id] = client_id  # Store mapping for future reconnections
-            script_logger.info(f"New client connected: {node_id}, assigned id: {client_id}")
-    # Load model and data
+    client_id = context.node_config['partition-id'] + 1
     script_logger.info(f"Loading model and data for client id: {client_id}")
     net = LSTM()
     train_loader, test_loader = load_data(client_id)
