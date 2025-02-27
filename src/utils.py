@@ -5,10 +5,11 @@ import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from logger import script_logger
 
 
 def create_lstm_windows(user_number, seconds=1, step=1, test_size=0.2, random_state=42):
-
+    script_logger.warning(f"Reading data for user {user_number}")
     df = pd.read_csv(f"data/labeled_sensor_data_merged_user-{user_number}.csv")
     df = df.drop(columns="ts")
 
