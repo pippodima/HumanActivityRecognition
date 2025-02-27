@@ -17,9 +17,9 @@ class FlowerClient(NumPyClient):
 
     def fit(self, parameters, config):
         set_weights(self.model, parameters)
-        script_logger.warning("Training Started")
+        script_logger.info("Training Started")
         train_loss = train(self.model, self.train_loader, self.local_epochs, self.device)
-        script_logger.warning("Training Ended")
+        script_logger.info("Training Ended")
         return get_weights(self.model), len(self.train_loader.dataset), {"train_loss": train_loss}
 
     def evaluate(self, parameters, config):
@@ -39,17 +39,17 @@ def client_fn(context: Context):
     # Check if node_id already exists in the mapping
     if node_id in client_id_map:
         client_id = client_id_map[node_id]
-        script_logger.warning(f"Reconnecting client: {node_id}, assigned id: {client_id}")
+        script_logger.info(f"Reconnecting client: {node_id}, assigned id: {client_id}")
     else:
         client_id = client_counter + 1
         client_counter += 1
         client_id_map[node_id] = client_id  # Store mapping for future reconnections
-        script_logger.warning(f"New client connected: {node_id}, assigned id: {client_id}")
+        script_logger.info(f"New client connected: {node_id}, assigned id: {client_id}")
     # Load model and data
-    script_logger.warning(f"Loading model and data for client id: {client_id}")
+    script_logger.info(f"Loading model and data for client id: {client_id}")
     net = LSTM()
     train_loader, test_loader = load_data(client_id)
-    script_logger.warning(f"Data loaded successfully for client id: {client_id}")
+    script_logger.info(f"Data loaded successfully for client id: {client_id}")
     local_epochs = context.run_config["local-epochs"]
 
     # Return Client instance
