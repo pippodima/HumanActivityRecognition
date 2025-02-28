@@ -32,7 +32,7 @@ import torch.nn as nn
 
 
 class LSTM(nn.Module):
-    def __init__(self, n_features=18, hidden_dim=64, n_outputs=15, num_layers=2, dropout_prob=0.2):
+    def __init__(self, n_features=18, hidden_dim=64, n_outputs=15, num_layers=2, dropout_prob=0.3):
         super(LSTM, self).__init__()
         self.hidden_dim = hidden_dim
         self.n_features = n_features
@@ -48,8 +48,8 @@ class LSTM(nn.Module):
             dropout=dropout_prob  # Dropout between LSTM layers
         )
 
-        # Batch normalization
-        self.batch_norm = nn.BatchNorm1d(hidden_dim)
+        # Layer normalization
+        self.layer_norm = nn.LayerNorm(hidden_dim)
 
         # Fully connected layer with weight regularization
         self.classifier = nn.Linear(hidden_dim, n_outputs)
@@ -65,7 +65,7 @@ class LSTM(nn.Module):
         last_output = lstm_out[:, -1, :]
 
         # Apply batch normalization
-        normalized_output = self.batch_norm(last_output)
+        normalized_output = self.layer_norm(last_output)
 
         # Apply final dropout
         out = self.final_dropout(normalized_output)

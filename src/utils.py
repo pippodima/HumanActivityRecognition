@@ -9,9 +9,9 @@ from logger import script_logger
 
 
 def create_lstm_windows(user_number, seconds=1, step=1, test_size=0.2, random_state=42):
-    script_logger.info(f"Reading data for user {user_number}")
     df = pd.read_csv(f"data/labeled_sensor_data_merged_user-{user_number}.csv")
     df = df.drop(columns="ts")
+    script_logger.info(f"Retrieved data for user {user_number}, data shape = {df.shape}")
 
     label_encoder = LabelEncoder()
     df["label"] = label_encoder.fit_transform(df["label"])
@@ -59,7 +59,7 @@ def load_data(client_id):
 def train(model, train_loader, num_epochs, device):
     model.to(device)
     criterion = torch.nn.CrossEntropyLoss().to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001, weight_decay=1e-4)
     model.train()
     for _ in range(num_epochs):
         total_loss = 0.0

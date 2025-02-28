@@ -1,5 +1,5 @@
 import torch
-import threading
+from sklearn.metrics import f1_score, precision_score, recall_score
 from logger import script_logger
 from flwr.client import ClientApp, NumPyClient
 from flwr.common import Context
@@ -26,9 +26,34 @@ class FlowerClient(NumPyClient):
     def evaluate(self, parameters, config):
         set_weights(self.model, parameters)
         loss, accuracy = test(self.model, self.test_loader, self.device)
-        return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
 
+        # Calculate additional metrics
+        precision, recall, f1 = self.calculate_additional_metrics()
 
+        return loss, len(self.test_loader.dataset), {
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1,
+        }
+
+    def calculate_additional_metrics(self):
+        # Use a similar approach as the test function to calculate precision, recall, and F1 score
+        y_true = []
+        y_pred = []
+
+        with torch.no_grad():
+            for inputs, labels in self.test_loader:
+                outputs = self.model(inputs)
+                _, predicted = torch.max(outputs, 1)
+                y_true.extend(labels.numpy())
+                y_pred.extend(predicted.numpy())
+
+        precision = precision_score(y_true, y_pred, average='weighted', zero_division=0)
+        recall = recall_score(y_true, y_pred, average='weighted', zero_division=0)
+        f1 = f1_score(y_true, y_pred, average='weighted', zero_division=0)
+
+        return precision, recall, f1
 
 
 def client_fn(context: Context):

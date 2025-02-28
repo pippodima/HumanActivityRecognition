@@ -18,7 +18,17 @@ def server_fn(context: Context):
         return {"avg_train_loss": sum(d[1]["train_loss"] for d in metrics) / len(metrics)}
 
     def aggregate_evaluate_metrics(metrics):
-        return {"avg_accuracy": sum(d[1]["accuracy"] for d in metrics) / len(metrics)}
+        avg_accuracy = sum(d[1]["accuracy"] for d in metrics) / len(metrics)
+        avg_precision = sum(d[1]["precision"] for d in metrics) / len(metrics)
+        avg_recall = sum(d[1]["recall"] for d in metrics) / len(metrics)
+        avg_f1 = sum(d[1]["f1_score"] for d in metrics) / len(metrics)
+
+        return {
+            "avg_accuracy": avg_accuracy,
+            "avg_precision": avg_precision,
+            "avg_recall": avg_recall,
+            "avg_f1_score": avg_f1,
+        }
 
     # Define strategy
     strategy = FedAvg(
