@@ -1,11 +1,17 @@
 import re
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use("TkAgg")  # Use TkAgg backend
+import argparse
 
+matplotlib.use("TkAgg")
+
+
+parser = argparse.ArgumentParser(description="Plot metrics from a log file.")
+parser.add_argument("filename", help="Path to the log file", default="100runLR0.001.txt")
+args = parser.parse_args()
 
 # Read the log file
-with open("150run.txt", "r") as file:
+with open(args.filename, "r") as file:
     data = file.read()
 
 # Extract loss values
@@ -52,6 +58,8 @@ for i, (title, x1, y1, x2, y2, color1, color2) in enumerate(metrics):
 
 # Adjust layout with extra padding
 plt.tight_layout(pad=7.0)  # Adds more space between plots
+combined_plot_filename = "combined_metrics_plot.png"
+plt.savefig(combined_plot_filename)
 plt.show()
 
 # === Individual Plots ===
@@ -65,4 +73,8 @@ for title, x1, y1, x2, y2, color1, color2 in metrics:
     plt.title(f"{title} over Rounds")
     plt.legend()
     plt.grid()
+
+    individual_plot_filename = f"{title.lower().replace(' ', '_')}_plot.png"
+    plt.savefig(individual_plot_filename)
+
     plt.show()
