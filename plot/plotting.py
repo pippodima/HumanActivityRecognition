@@ -6,8 +6,10 @@ import argparse
 matplotlib.use("TkAgg")
 
 
+# Set up argparse to handle command-line arguments
 parser = argparse.ArgumentParser(description="Plot metrics from a log file.")
-parser.add_argument("filename", help="Path to the log file", default="100runLR0.001.txt")
+parser.add_argument("-f","--filename", help="Path to the log file", default="rawLogs/100runLR0.001.txt")
+parser.add_argument("-s", "--save", help="Save the plots (default: False)", action="store_true")
 args = parser.parse_args()
 
 # Read the log file
@@ -23,7 +25,6 @@ loss_values = [float(loss) for _, loss in loss_pattern]
 train_loss_pattern = re.findall(r"\((\d+), ([\d.]+)\)", data)
 train_rounds = [int(round_num) for round_num, _ in train_loss_pattern]
 train_loss_values = [float(loss) for _, loss in train_loss_pattern]
-
 
 # Number of rounds for each metric
 num_rounds = len(train_rounds) // 5
@@ -58,8 +59,12 @@ for i, (title, x1, y1, x2, y2, color1, color2) in enumerate(metrics):
 
 # Adjust layout with extra padding
 plt.tight_layout(pad=7.0)  # Adds more space between plots
-combined_plot_filename = "combined_metrics_plot.png"
-plt.savefig(combined_plot_filename)
+
+# If the --save flag is set, save the combined plot
+if args.save:
+    combined_plot_filename = "combined_metrics_plot.png"
+    plt.savefig(combined_plot_filename)
+
 plt.show()
 
 # === Individual Plots ===
@@ -74,7 +79,9 @@ for title, x1, y1, x2, y2, color1, color2 in metrics:
     plt.legend()
     plt.grid()
 
-    individual_plot_filename = f"{title.lower().replace(' ', '_')}_plot.png"
-    plt.savefig(individual_plot_filename)
+    # If the --save flag is set, save individual plots
+    if args.save:
+        individual_plot_filename = f"{title.lower().replace(' ', '_')}_plot.png"
+        plt.savefig(individual_plot_filename)
 
     plt.show()
