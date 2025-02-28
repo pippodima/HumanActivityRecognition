@@ -5,7 +5,7 @@ matplotlib.use("TkAgg")  # Use TkAgg backend
 
 
 # Read the log file
-with open("run.txt", "r") as file:
+with open("150run.txt", "r") as file:
     data = file.read()
 
 # Extract loss values

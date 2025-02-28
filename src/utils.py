@@ -59,7 +59,7 @@ def load_data(client_id):
 def train(model, train_loader, num_epochs, device):
     model.to(device)
     criterion = torch.nn.CrossEntropyLoss().to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001, weight_decay=1e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
     model.train()
     for _ in range(num_epochs):
         total_loss = 0.0
