@@ -45,5 +45,3 @@ In the `project` directory, use `flwr run` to run a local simulation:
 ```bash
 flwr run .
 ```
-
-## Resources
