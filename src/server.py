@@ -7,39 +7,35 @@ from src.utils import get_weights
 from models.lstm import LSTM
 
 
-# Define function to save model weights
-def save_model_weights(parameters, round_num, save_dir="models/saved_models", save_every=5):
+round_num = 0
+save_model = False
+
+
+def save_model_weights(parameters, round_num, save_dir="models/saved_models", save_every=10):
     if round_num % save_every == 0:  # Save every 'save_every' rounds
         os.makedirs(save_dir, exist_ok=True)
         filepath = os.path.join(save_dir, f"model_round_{round_num}.pkl")
 
-        # Convert parameters to ndarrays
         ndarrays = parameters_to_ndarrays(parameters)
 
-        # Save as pickle
         with open(filepath, "wb") as f:
             pickle.dump(ndarrays, f)
 
         print(f"Model saved at round {round_num} to {filepath}")
 
 
-round_num = 0
-
-
 def server_fn(context: Context):
-    # Read from config
     num_rounds = context.run_config["num-server-rounds"]
     fraction_fit = context.run_config["fraction-fit"]
 
-    # Initialize model parameters
     ndarrays = get_weights(LSTM())
     parameters = ndarrays_to_parameters(ndarrays)
 
     def aggregate_fit_metrics(metrics):
-        # Save model every 'save_every' rounds
         global round_num
         round_num += 1
-        save_model_weights(parameters, round_num)
+        if save_model:
+            save_model_weights(parameters, round_num, save_every=10)
 
         return {"avg_train_loss": sum(d[1]["train_loss"] for d in metrics) / len(metrics)}
 
@@ -56,7 +52,6 @@ def server_fn(context: Context):
             "avg_f1_score": avg_f1,
         }
 
-    # Define strategy
     strategy = FedAvg(
         fraction_fit=fraction_fit,
         fraction_evaluate=1.0,
@@ -70,5 +65,4 @@ def server_fn(context: Context):
     return ServerAppComponents(strategy=strategy, config=config)
 
 
-# Create ServerApp
 app = ServerApp(server_fn=server_fn)
